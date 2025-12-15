@@ -47,6 +47,12 @@ Render templates in GitHub Actions using environment variables.
 
 ## Quickstart
 
+<p align="center">
+  <a href="https://github.com/marketplace/actions/templateer">
+    <img alt="Release" src="assets/templateer-example-large.png" />
+  </a>
+</p>
+
 ### 1) Create a template
 
 ```md
