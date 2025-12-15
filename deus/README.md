@@ -92,46 +92,46 @@ jobs:
           echo "-----"
           echo "${{ steps.tpl.outputs.body }}"
           echo "-----"
-
 ```
 
-Template rules
-	•	Placeholders follow envsubst syntax: $VAR
-	•	Variables can come from:
-	•	env: in the same step
-	•	env: at the job level
-	•	previous steps via $GITHUB_ENV
+#### Template rules
+ - Placeholders follow envsubst syntax: $VAR
+ - Variables can come from:
+ - env: in the same step
+ - env: at the job level
+ - previous steps via $GITHUB_ENV
 
 ⸻
 
-Debug mode
+#### Debug mode
 
-Enable debug only when needed:
+###### Enable debug only when needed:
 
-- name: Render template
+```yml
+name: Render template
   uses: Malnati/templateer@v1.0.0
   with:
     template: .github/templates/report.md
     result: /tmp/report.rendered.md
     debug: "true"
-
-
-⸻
-
-Security notes
-	•	Avoid debug: "true" if your environment may contain secrets.
-	•	Prefer passing only the variables you need via env: on the step, instead of exporting a large environment.
+```
 
 ⸻
 
-Lim#### Limitations	envsubst does not support conditional logic.
-	•	sing variables may render as empty strings.
-	•	GitHub-hosted runners typically have envsubst available on ubuntu-latest.
+#### Security notes
+ - Avoid debug: "true" if your environment may contain secrets.
+ - Prefer passing only the variables you need via env: on the step, instead of exporting a large environment.
+
+⸻
+
+#### Limitations envsubst does not support conditional logic.
+ - single variables may render as empty strings.
+ - GitHub-hosted runners typically have envsubst available on ubuntu-latest.
 
 ⸻
 
 #### Links
-- Repository: https://github.com/Malnati/templateer
-	•	Releases: https://github.com/Malnati/templateer/releases
-	•	License: https://github.com/Malnati/templateer/blob/main/LICENSE
+ - Repository: https://github.com/Malnati/templateer
+ - Releases: https://github.com/Malnati/templateer/releases
+ - License: https://github.com/Malnati/templateer/blob/main/LICENSE
 
