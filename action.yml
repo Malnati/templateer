@@ -11,31 +11,52 @@ inputs:
   template:
     description: "Caminho do template."
     required: true
-  output:
+  result:
     description: "Caminho do arquivo de saída."
     required: true
+  debug:
+    description: "Se 'true', imprime as variáveis exportadas."
+    required: false
+    default: "false"
+
+outputs:
+  path:
+    description: "Caminho do arquivo renderizado."
+    value: ${{ steps.replacer.outputs.path }}
+  body:
+    description: "Conteúdo renderizado."
+    value: ${{ steps.replacer.outputs.body }}
 
 runs:
   using: "composite"
   steps:
-
     - name: Exporter
       id: exporter
       shell: bash
+      env:
+        DEBUG: ${{ inputs.debug }}
       run: |
         set -euo pipefail
-        echo "🪄 Exportando variáveis para o PR template"
+        echo "🪄 Exportando variáveis para o template"
         env | grep -v '^GITHUB_' | while IFS='=' read -r key value; do
+          if [ "${DEBUG:-false}" = "true" ]; then
+            printf '%s=%s\n' "$key" "$value"
+          fi
           printf '%s=%s\n' "$key" "$value" >> "$GITHUB_ENV"
         done
-        
+
     - name: "📄 Render"
-      id: render
-      uses: Malnati/template-render@v1.0.1
-      with:
-        template: ${{ inputs.template }}
-        output: ${{ inputs.output }}
-
-
-                
-
+      id: replacer
+      shell: bash
+      env:
+        TEMPLATE_RESOLVED: ${{ inputs.template }}
+        OUTPUT_RESOLVED: ${{ inputs.result }}
+      run: |
+        set -euo pipefail
+        envsubst < "$TEMPLATE_RESOLVED" > "$OUTPUT_RESOLVED"
+        echo "path=$OUTPUT_RESOLVED" >> "$GITHUB_OUTPUT"
+        {
+          printf 'body<<EOF\n'
+          cat "$OUTPUT_RESOLVED"
+          printf '\nEOF\n'
+        } >> "$GITHUB_OUTPUT"
