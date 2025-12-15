@@ -1,0 +1,524 @@
+<!-- docs/index.html -->
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Templateer — Render templates in GitHub Actions</title>
+    <meta name="description" content="Templateer is a GitHub Composite Action that renders templates using envsubst and environment variables." />
+    <meta name="color-scheme" content="light dark" />
+    <style>
+      :root {
+        --bg: #0b1220;
+        --card: rgba(255,255,255,0.06);
+        --text: rgba(255,255,255,0.92);
+        --muted: rgba(255,255,255,0.70);
+        --border: rgba(255,255,255,0.12);
+        --accent: #7c3aed;
+        --accent2: #22c55e;
+        --shadow: 0 12px 40px rgba(0,0,0,0.35);
+        --radius: 18px;
+        --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+        --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+      }
+      @media (prefers-color-scheme: light) {
+        :root {
+          --bg: #f7fafc;
+          --card: rgba(0,0,0,0.04);
+          --text: rgba(0,0,0,0.92);
+          --muted: rgba(0,0,0,0.68);
+          --border: rgba(0,0,0,0.10);
+          --shadow: 0 12px 40px rgba(0,0,0,0.10);
+        }
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        font-family: var(--sans);
+        color: var(--text);
+        background: radial-gradient(1000px 600px at 15% 0%, rgba(124,58,237,0.25), transparent 60%),
+                    radial-gradient(900px 550px at 85% 20%, rgba(34,197,94,0.18), transparent 60%),
+                    var(--bg);
+      }
+      a { color: inherit; text-decoration: none; }
+      .container { width: min(1120px, calc(100% - 40px)); margin: 0 auto; }
+      .nav {
+        position: sticky; top: 0; z-index: 10;
+        backdrop-filter: blur(10px);
+        background: color-mix(in oklab, var(--bg) 75%, transparent);
+        border-bottom: 1px solid var(--border);
+      }
+      .nav-inner {
+        display: flex; align-items: center; justify-content: space-between;
+        padding: 14px 0;
+      }
+      .brand { display: flex; align-items: center; gap: 10px; font-weight: 800; letter-spacing: 0.2px; }
+      .dot {
+        width: 12px; height: 12px; border-radius: 999px;
+        background: linear-gradient(135deg, var(--accent), var(--accent2));
+        box-shadow: 0 0 0 5px rgba(124,58,237,0.12);
+      }
+      .nav-links { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; justify-content: flex-end; }
+      .nav-links a {
+        padding: 8px 10px; border-radius: 10px; color: var(--muted);
+      }
+      .nav-links a:hover { background: var(--card); color: var(--text); }
+      .btn {
+        display: inline-flex; align-items: center; gap: 10px;
+        padding: 10px 14px; border-radius: 12px;
+        border: 1px solid var(--border);
+        background: var(--card);
+        color: var(--text);
+        box-shadow: none;
+      }
+      .btn:hover { border-color: color-mix(in oklab, var(--accent) 35%, var(--border)); }
+      .btn-primary {
+        background: linear-gradient(135deg, color-mix(in oklab, var(--accent) 85%, #000 15%), color-mix(in oklab, var(--accent2) 60%, var(--accent) 40%));
+        border-color: rgba(255,255,255,0.18);
+      }
+      .btn-primary:hover { filter: brightness(1.03); }
+      .hero { padding: 58px 0 28px; }
+      .hero-grid {
+        display: grid; grid-template-columns: 1.15fr 0.85fr;
+        gap: 22px; align-items: stretch;
+      }
+      @media (max-width: 980px) {
+        .hero-grid { grid-template-columns: 1fr; }
+      }
+      .card {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+      }
+      .hero-card { padding: 26px; }
+      h1 {
+        margin: 0 0 10px;
+        font-size: clamp(28px, 3.4vw, 46px);
+        line-height: 1.05;
+        letter-spacing: -0.8px;
+      }
+      .lead { margin: 0 0 18px; color: var(--muted); font-size: 16px; line-height: 1.55; }
+      .badges { display: flex; flex-wrap: wrap; gap: 10px; margin: 14px 0 0; }
+      .badges img { height: 20px; }
+      .cta { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 18px; }
+      .side { padding: 18px; display: flex; flex-direction: column; gap: 12px; }
+      .kpi {
+        padding: 14px;
+        border-radius: 16px;
+        border: 1px solid var(--border);
+        background: rgba(255,255,255,0.04);
+      }
+      .kpi strong { display: block; font-size: 14px; }
+      .kpi span { display: block; color: var(--muted); font-size: 13px; margin-top: 4px; line-height: 1.5; }
+      .section { padding: 26px 0; }
+      .section h2 { margin: 0 0 12px; font-size: 22px; letter-spacing: -0.2px; }
+      .section p { margin: 0; color: var(--muted); line-height: 1.6; }
+      .grid-3 {
+        margin-top: 14px;
+        display: grid; grid-template-columns: repeat(3, 1fr);
+        gap: 14px;
+      }
+      @media (max-width: 980px) { .grid-3 { grid-template-columns: 1fr; } }
+      .tile { padding: 16px; }
+      .tile h3 { margin: 0 0 6px; font-size: 16px; }
+      .tile p { margin: 0; font-size: 13.5px; }
+      .codewrap { padding: 16px; overflow: hidden; }
+      pre {
+        margin: 0;
+        padding: 14px;
+        border-radius: 14px;
+        border: 1px solid var(--border);
+        background: rgba(0,0,0,0.22);
+        overflow: auto;
+        font-family: var(--mono);
+        font-size: 12.5px;
+        line-height: 1.55;
+      }
+      @media (prefers-color-scheme: light) {
+        pre { background: rgba(0,0,0,0.04); }
+      }
+      .row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 14px;
+        margin-top: 14px;
+      }
+      @media (max-width: 980px) { .row { grid-template-columns: 1fr; } }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        overflow: hidden;
+        border-radius: 14px;
+        border: 1px solid var(--border);
+        background: rgba(255,255,255,0.02);
+      }
+      th, td {
+        padding: 10px 12px;
+        border-bottom: 1px solid var(--border);
+        text-align: left;
+        vertical-align: top;
+        font-size: 13px;
+      }
+      th { color: var(--muted); font-weight: 700; }
+      tr:last-child td { border-bottom: none; }
+      code { font-family: var(--mono); font-size: 0.95em; }
+      .copybar {
+        display: flex; gap: 10px; align-items: center; justify-content: space-between;
+        padding: 10px 12px;
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        background: rgba(255,255,255,0.03);
+        margin-bottom: 10px;
+      }
+      .copybar .label { color: var(--muted); font-size: 13px; }
+      .copybtn {
+        cursor: pointer;
+        border: 1px solid var(--border);
+        background: var(--card);
+        color: var(--text);
+        padding: 8px 10px;
+        border-radius: 12px;
+        font-size: 13px;
+      }
+      .copybtn:hover { border-color: color-mix(in oklab, var(--accent) 35%, var(--border)); }
+      footer {
+        padding: 28px 0 36px;
+        border-top: 1px solid var(--border);
+        color: var(--muted);
+        font-size: 13px;
+      }
+      .footer-inner { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+      .pill {
+        display: inline-flex; align-items: center; gap: 8px;
+        border: 1px solid var(--border);
+        background: rgba(255,255,255,0.03);
+        padding: 8px 10px;
+        border-radius: 999px;
+      }
+      .small { font-size: 12px; color: var(--muted); }
+    </style>
+  </head>
+
+  <body>
+    <div class="nav">
+      <div class="container">
+        <div class="nav-inner">
+          <div class="brand">
+            <span class="dot" aria-hidden="true"></span>
+            <span>Templateer</span>
+          </div>
+          <div class="nav-links">
+            <a href="#features">Features</a>
+            <a href="#quickstart">Quickstart</a>
+            <a href="#reference">Reference</a>
+            <a href="#examples">Examples</a>
+            <a class="btn btn-primary" href="https://github.com/Malnati/templateer" rel="noopener">GitHub</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <header class="hero">
+      <div class="container">
+        <div class="hero-grid">
+          <div class="card hero-card">
+            <h1>Render templates in GitHub Actions using <code>env</code> variables.</h1>
+            <p class="lead">
+              <b>Templateer</b> is a GitHub Composite Action that renders template files via <code>envsubst</code>,
+              leveraging variables provided in <code>env:</code> or persisted through <code>$GITHUB_ENV</code>.
+              It also exposes outputs so you can reuse the rendered content in PR comments, reports, and pipelines.
+            </p>
+
+            <div class="cta">
+              <a class="btn btn-primary" href="#quickstart">Get started</a>
+              <a class="btn" href="https://github.com/Malnati/templateer/releases" rel="noopener">Releases</a>
+              <a class="btn" href="https://github.com/Malnati/templateer/issues" rel="noopener">Issues</a>
+            </div>
+
+            <div class="badges" aria-label="badges">
+              <img alt="CI" src="https://img.shields.io/github/actions/workflow/status/Malnati/templateer/ci.yml?branch=main" />
+              <img alt="Release" src="https://img.shields.io/github/v/release/Malnati/templateer?sort=semver" />
+              <img alt="License" src="https://img.shields.io/github/license/Malnati/templateer" />
+              <img alt="Issues" src="https://img.shields.io/github/issues/Malnati/templateer" />
+            </div>
+          </div>
+
+          <div class="card side">
+            <div class="kpi">
+              <strong>Works with GitHub Pages</strong>
+              <span>Static HTML, no build step, no bundlers. Just publish <code>docs/</code>.</span>
+            </div>
+            <div class="kpi">
+              <strong>Designed for pipelines</strong>
+              <span>Renders a file and returns <code>path</code> + <code>body</code> outputs.</span>
+            </div>
+            <div class="kpi">
+              <strong>Optional debug</strong>
+              <span>Enable <code>debug=true</code> to print exported variables (use carefully).</span>
+            </div>
+            <div class="kpi">
+              <strong>Minimal dependencies</strong>
+              <span>Uses <code>envsubst</code> (available on <code>ubuntu-latest</code>).</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <section id="features" class="section">
+        <div class="container">
+          <h2>Features</h2>
+          <p>Simple, predictable, and easy to compose with your existing workflows.</p>
+
+          <div class="grid-3">
+            <div class="card tile">
+              <h3>Step-level <code>env:</code> support</h3>
+              <p>Pass variables directly in the workflow step and render templates without extra tooling.</p>
+            </div>
+            <div class="card tile">
+              <h3>Outputs for downstream steps</h3>
+              <p>Consume the rendered content as <code>outputs.body</code> and the file location as <code>outputs.path</code>.</p>
+            </div>
+            <div class="card tile">
+              <h3>Debug switch</h3>
+              <p>Optionally print exported variables with <code>debug=true</code> when troubleshooting.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="quickstart" class="section">
+        <div class="container">
+          <h2>Quickstart</h2>
+          <p>Render a markdown file from a template using environment variables.</p>
+
+          <div class="row">
+            <div class="card codewrap">
+              <div class="copybar">
+                <div class="label"><b>Template</b> (<code>.github/templates/report.md</code>)</div>
+                <button class="copybtn" data-copy="template">Copy</button>
+              </div>
+              <pre id="template"><code>Hello, $NAME.
+
+File: $FILE_NAME
+Repository: $GITHUB_REPOSITORY
+</code></pre>
+            </div>
+
+            <div class="card codewrap">
+              <div class="copybar">
+                <div class="label"><b>Workflow</b> (<code>.github/workflows/example.yml</code>)</div>
+                <button class="copybtn" data-copy="workflow">Copy</button>
+              </div>
+              <pre id="workflow"><code>name: templateer-example
+
+on:
+  workflow_dispatch:
+
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Render template
+        id: tpl
+        uses: Malnati/templateer@v1.0.0
+        env:
+          NAME: Ricardo
+          FILE_NAME: .reports/20251215-0100_hardcode.json
+        with:
+          template: .github/templates/report.md
+          result: /tmp/report.rendered.md
+
+      - name: Print path
+        shell: bash
+        run: echo "${{ steps.tpl.outputs.path }}"
+
+      - name: Print content
+        shell: bash
+        run: |
+          echo "-----"
+          echo "${{ steps.tpl.outputs.body }}"
+          echo "-----"
+</code></pre>
+            </div>
+          </div>
+
+          <p class="small" style="margin-top: 10px;">
+            Template placeholders follow <code>envsubst</code> syntax (e.g., <code>$VAR</code>).
+          </p>
+        </div>
+      </section>
+
+      <section id="reference" class="section">
+        <div class="container">
+          <h2>Reference</h2>
+          <p>Inputs and outputs exposed by the action.</p>
+
+          <div class="row">
+            <div class="card codewrap">
+              <h3 style="margin:0 0 10px;">Inputs</h3>
+              <table>
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Required</th>
+                    <th>Default</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><code>template</code></td>
+                    <td>Yes</td>
+                    <td>-</td>
+                    <td>Template file path</td>
+                  </tr>
+                  <tr>
+                    <td><code>result</code></td>
+                    <td>Yes</td>
+                    <td>-</td>
+                    <td>Rendered output file path</td>
+                  </tr>
+                  <tr>
+                    <td><code>debug</code></td>
+                    <td>No</td>
+                    <td><code>false</code></td>
+                    <td>If <code>true</code>, prints exported variables to logs</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="card codewrap">
+              <h3 style="margin:0 0 10px;">Outputs</h3>
+              <table>
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><code>path</code></td>
+                    <td>Rendered file path</td>
+                  </tr>
+                  <tr>
+                    <td><code>body</code></td>
+                    <td>Rendered content (multiline)</td>
+                  </tr>
+                </tbody>
+              </table>
+
+              <div style="margin-top: 12px;">
+                <div class="pill">
+                  <span aria-hidden="true">⚠️</span>
+                  <span>Use <code>debug=true</code> carefully in repos that handle secrets.</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="examples" class="section">
+        <div class="container">
+          <h2>More examples</h2>
+          <p>Common patterns for PR comments, reports, and multi-step pipelines.</p>
+
+          <div class="grid-3">
+            <div class="card tile">
+              <h3>PR comment body</h3>
+              <p>Use <code>outputs.body</code> as the message body for your PR comment action.</p>
+            </div>
+            <div class="card tile">
+              <h3>Attach rendered file</h3>
+              <p>Use <code>outputs.path</code> to publish artifacts or commit generated markdown.</p>
+            </div>
+            <div class="card tile">
+              <h3>Pipeline templates</h3>
+              <p>Render timeline messages, checklists, and status reports consistently across workflows.</p>
+            </div>
+          </div>
+
+          <div class="card codewrap" style="margin-top: 14px;">
+            <div class="copybar">
+              <div class="label"><b>Example</b> using outputs</div>
+              <button class="copybtn" data-copy="outputs">Copy</button>
+            </div>
+            <pre id="outputs"><code>- name: Render template
+  id: tpl
+  uses: Malnati/templateer@v1.0.0
+  env:
+    TITLE: "Hardcode Report"
+    COUNT: "42"
+  with:
+    template: .github/templates/timeline.md
+    result: /tmp/timeline.rendered.md
+
+- name: Use rendered content
+  shell: bash
+  run: |
+    echo "${{ steps.tpl.outputs.body }}"
+</code></pre>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <div class="container">
+        <div class="footer-inner">
+          <div>
+            <div><b>Templateer</b> — GitHub Action template renderer</div>
+            <div class="small">Built for predictable automation and clean pipeline outputs.</div>
+          </div>
+          <div style="display:flex; gap:10px; flex-wrap:wrap;">
+            <a class="pill" href="https://github.com/Malnati/templateer" rel="noopener">Repository</a>
+            <a class="pill" href="https://github.com/Malnati/templateer/releases" rel="noopener">Releases</a>
+            <a class="pill" href="https://github.com/Malnati/templateer/blob/main/LICENSE" rel="noopener">License</a>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <script>
+      const byId = (id) => document.getElementById(id);
+      const text = (id) => byId(id).innerText;
+
+      async function copyToClipboard(value) {
+        try {
+          await navigator.clipboard.writeText(value);
+          return true;
+        } catch (_) {
+          const ta = document.createElement("textarea");
+          ta.value = value;
+          ta.style.position = "fixed";
+          ta.style.left = "-9999px";
+          document.body.appendChild(ta);
+          ta.focus();
+          ta.select();
+          const ok = document.execCommand("copy");
+          document.body.removeChild(ta);
+          return ok;
+        }
+      }
+
+      document.querySelectorAll("[data-copy]").forEach((btn) => {
+        btn.addEventListener("click", async () => {
+          const target = btn.getAttribute("data-copy");
+          const map = { template: "template", workflow: "workflow", outputs: "outputs" };
+          const id = map[target];
+          const ok = await copyToClipboard(text(id));
+          const prev = btn.textContent;
+          btn.textContent = ok ? "Copied" : "Copy failed";
+          setTimeout(() => (btn.textContent = prev), 900);
+        });
+      });
+    </script>
+  </body>
+</html>
