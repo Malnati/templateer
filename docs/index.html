@@ -51,6 +51,7 @@
       .logo {
         height: 28px;
         width: auto;
+        aspect-ratio: 640 / 316;
       }
       .nav-inner {
         display: flex; align-items: center; justify-content: space-between;
@@ -113,7 +114,7 @@
         border: 1px solid var(--border);
         background: rgba(255,255,255,0.02);
       }
-      .hero-visual img { display: block; width: 100%; height: auto; }
+      .hero-visual img { display: block; width: 100%; height: auto; aspect-ratio: 1280 / 633; }
       .caption { margin: 8px 0 0; color: var(--muted); font-size: 12.5px; }
       .inline-illustration {
         margin: 12px 0 0;
@@ -121,7 +122,7 @@
         border-radius: 12px;
         overflow: hidden;
       }
-      .inline-illustration img { display: block; width: 100%; height: auto; }
+      .inline-illustration img { display: block; width: 100%; height: auto; aspect-ratio: 1456 / 720; }
       .kpi {
         padding: 14px;
         border-radius: 16px;
@@ -215,7 +216,7 @@
         padding: 8px 10px;
         border-radius: 999px;
       }
-      .pill img { height: 20px; width: 20px; border-radius: 50%; }
+      .pill img { height: 20px; width: 20px; border-radius: 50%; aspect-ratio: 1 / 1; }
       .small { font-size: 12px; color: var(--muted); }
     </style>
   </head>
@@ -225,7 +226,7 @@
       <div class="container">
         <div class="nav-inner">
           <div class="brand">
-            <img class="logo" src="../assets/templateer-logo-small.png" alt="Templateer logo" />
+            <img class="logo" src="https://raw.githubusercontent.com/Malnati/templateer/main/assets/templateer-logo-small.png" alt="Templateer logo" />
             <span>Templateer</span>
           </div>
           <div class="nav-links">
@@ -269,7 +270,7 @@
 
           <div class="card side">
             <div class="hero-visual" aria-hidden="true">
-              <img src="../assets/templateer-example-large.png" alt="Rendered template preview" />
+              <img src="https://raw.githubusercontent.com/Malnati/templateer/main/assets/templateer-example-large.png" alt="Rendered template preview" />
             </div>
             <p class="caption">Rendered output preview using a Templateer workflow.</p>
             <div class="kpi">
@@ -324,7 +325,7 @@
           <p>Render a markdown file from a template using environment variables.</p>
 
           <div class="inline-illustration" aria-hidden="true">
-            <img src="../assets/templateer-example.png" alt="Templateer quickstart overview" />
+            <img src="https://raw.githubusercontent.com/Malnati/templateer/main/assets/templateer-example.png" alt="Templateer quickstart overview" />
           </div>
 
           <div class="row">
@@ -531,7 +532,7 @@ jobs:
             <a class="pill" href="https://github.com/Malnati/templateer/releases" rel="noopener">Releases</a>
             <a class="pill" href="https://github.com/Malnati/templateer/blob/main/LICENSE" rel="noopener">License</a>
             <span class="pill" aria-label="Templateer mascot">
-              <img src="../assets/templateer-avatar.png" alt="Templateer avatar" />
+              <img src="https://raw.githubusercontent.com/Malnati/templateer/main/assets/templateer-avatar.png" alt="Templateer avatar" />
               <span>Built with care</span>
             </span>
           </div>
