@@ -2,13 +2,10 @@
 <h1 align="center">Malnati/templateer</h1>
 
 <p align="center">
-  <b>Engine simples para renderizar templates em GitHub Actions usando variáveis de ambiente.</b>
+  <b>A simple engine to render templates in GitHub Actions using environment variables.</b>
 </p>
 
 <p align="center">
-  <a href="https://github.com/Malnati/templateer/actions/workflows/ci.yml">
-    <img alt="CI" src="https://img.shields.io/github/actions/workflow/status/Malnati/templateer/ci.yml?branch=main" />
-  </a>
   <a href="https://github.com/Malnati/templateer/releases">
     <img alt="Release" src="https://img.shields.io/github/v/release/Malnati/templateer?sort=semver" />
   </a>
@@ -22,25 +19,25 @@
 
 <hr />
 
-<h2>O que é</h2>
+<h2>What it is</h2>
 
 <p>
-  O <b>Templateer</b> é uma <i>composite action</i> para renderizar arquivos de template usando
-  <code>envsubst</code> com base nas variáveis de ambiente disponíveis no step/job do GitHub Actions.
+  <b>Templateer</b> is a GitHub <i>composite action</i> that renders template files using
+  <code>envsubst</code> based on environment variables available in the GitHub Actions step/job.
 </p>
 
 <ul>
-  <li>Recebe <code>template</code> e <code>result</code></li>
-  <li>Opcionalmente imprime variáveis exportadas via <code>debug=true</code></li>
-  <li>Gera outputs: <code>path</code> e <code>body</code></li>
+  <li>Accepts <code>template</code> and <code>result</code></li>
+  <li>Optionally prints exported variables via <code>debug=true</code></li>
+  <li>Produces outputs: <code>path</code> and <code>body</code></li>
 </ul>
 
-<h2>Como funciona</h2>
+<h2>How it works</h2>
 
 <ol>
-  <li>Exporta variáveis do ambiente para <code>$GITHUB_ENV</code> (exceto as que começam com <code>GITHUB_</code>)</li>
-  <li>Executa <code>envsubst</code> para substituir placeholders (ex.: <code>$VAR</code>) no template</li>
-  <li>Publica o caminho do arquivo e o conteúdo renderizado como outputs</li>
+  <li>Exports environment variables to <code>$GITHUB_ENV</code> (except those starting with <code>GITHUB_</code>)</li>
+  <li>Runs <code>envsubst</code> to replace placeholders (e.g., <code>$VAR</code>) in the template</li>
+  <li>Publishes the rendered file path and rendered content as outputs</li>
 </ol>
 
 <h2>Inputs</h2>
@@ -49,29 +46,29 @@
   <thead>
     <tr>
       <th>Input</th>
-      <th>Obrigatório</th>
-      <th>Padrão</th>
-      <th>Descrição</th>
+      <th>Required</th>
+      <th>Default</th>
+      <th>Description</th>
     </tr>
   </thead>
   <tbody>
     <tr>
       <td><code>template</code></td>
-      <td>Sim</td>
+      <td>Yes</td>
       <td>-</td>
-      <td>Caminho do arquivo de template</td>
+      <td>Template file path</td>
     </tr>
     <tr>
       <td><code>result</code></td>
-      <td>Sim</td>
+      <td>Yes</td>
       <td>-</td>
-      <td>Caminho do arquivo de saída renderizado</td>
+      <td>Rendered output file path</td>
     </tr>
     <tr>
       <td><code>debug</code></td>
-      <td>Não</td>
+      <td>No</td>
       <td><code>false</code></td>
-      <td>Se <code>true</code>, imprime as variáveis exportadas no log</td>
+      <td>If <code>true</code>, prints exported variables to logs</td>
     </tr>
   </tbody>
 </table>
@@ -82,30 +79,30 @@
   <thead>
     <tr>
       <th>Output</th>
-      <th>Descrição</th>
+      <th>Description</th>
     </tr>
   </thead>
   <tbody>
     <tr>
       <td><code>path</code></td>
-      <td>Caminho do arquivo renderizado</td>
+      <td>Rendered file path</td>
     </tr>
     <tr>
       <td><code>body</code></td>
-      <td>Conteúdo renderizado (multiline)</td>
+      <td>Rendered content (multiline)</td>
     </tr>
   </tbody>
 </table>
 
-<h2>Exemplo de uso</h2>
+<h2>Usage example</h2>
 
 <h3>1) Template</h3>
 
 <pre><code># .github/templates/report.md
-Olá, $NAME.
+Hello, $NAME.
 
-Arquivo: $FILE_NAME
-Repositório: $GITHUB_REPOSITORY
+File: $FILE_NAME
+Repository: $GITHUB_REPOSITORY
 </code></pre>
 
 <h3>2) Workflow</h3>
@@ -132,11 +129,11 @@ jobs:
           template: .github/templates/report.md
           result: /tmp/report.rendered.md
 
-      - name: Mostrar caminho
+      - name: Print path
         shell: bash
         run: echo "${{ steps.tpl.outputs.path }}"
 
-      - name: Mostrar conteúdo
+      - name: Print content
         shell: bash
         run: |
           echo "-----"
@@ -144,22 +141,22 @@ jobs:
           echo "-----"
 </code></pre>
 
-<h2>Regras do template</h2>
+<h2>Template rules</h2>
 
 <ul>
-  <li>Use placeholders no formato <code>$VAR</code> (padrão do <code>envsubst</code>).</li>
-  <li>As variáveis podem vir de <code>env:</code> do step/job, ou de steps anteriores via <code>$GITHUB_ENV</code>.</li>
+  <li>Use placeholders in the <code>$VAR</code> format (standard <code>envsubst</code> syntax).</li>
+  <li>Variables can come from <code>env:</code> at the step/job level, or from previous steps via <code>$GITHUB_ENV</code>.</li>
 </ul>
 
-<h2>Limitações</h2>
+<h2>Limitations</h2>
 
 <ul>
-  <li><code>envsubst</code> substitui somente variáveis de ambiente, não executa lógica condicional.</li>
-  <li>Se uma variável não existir, o placeholder pode ficar vazio no resultado.</li>
+  <li><code>envsubst</code> only replaces environment variables; it does not support conditional logic.</li>
+  <li>If a variable does not exist, the placeholder may become empty in the rendered output.</li>
 </ul>
 
-<h2>Licença</h2>
+<h2>License</h2>
 
 <p>
-  Consulte o arquivo <a href="https://github.com/Malnati/templateer/blob/main/LICENSE">LICENSE</a>.
+  See <a href="https://github.com/Malnati/templateer/blob/main/LICENSE">LICENSE</a>.
 </p>
