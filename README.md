@@ -21,6 +21,12 @@
 
 <h2>What it is</h2>
 
+<p align="center">
+  <a href="https://github.com/marketplace/actions/templateer">
+    <img alt="Release" src="assets/templateer-logo-large.png" />
+  </a>
+</p>
+
 <p>
   <b>Templateer</b> is a GitHub <i>composite action</i> that renders template files using
   <code>envsubst</code> based on environment variables available in the GitHub Actions step/job.
