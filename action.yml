@@ -1,0 +1,41 @@
+# Malnati/templateer@v1.0.0
+name: "Templateer"
+description: "Engine de renderizar templates."
+author: "Ricardo Malnati"
+
+branding:
+  icon: "file-text"
+  color: "blue"
+
+inputs:
+  template:
+    description: "Caminho do template."
+    required: true
+  output:
+    description: "Caminho do arquivo de saída."
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+
+    - name: Exporter
+      id: exporter
+      shell: bash
+      run: |
+        set -euo pipefail
+        echo "🪄 Exportando variáveis para o PR template"
+        env | grep -v '^GITHUB_' | while IFS='=' read -r key value; do
+          printf '%s=%s\n' "$key" "$value" >> "$GITHUB_ENV"
+        done
+        
+    - name: "📄 Render"
+      id: render
+      uses: Malnati/template-render@v1.0.1
+      with:
+        template: ${{ inputs.template }}
+        output: ${{ inputs.output }}
+
+
+                
+
