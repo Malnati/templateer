@@ -1,6 +1,5 @@
 <!-- README.md -->
 <h1 align="center">Malnati/templateer</h1>
-
 <p align="center">
   <b>A simple engine to render templates in GitHub Actions using environment variables.</b>
 </p>
@@ -45,6 +44,12 @@
   <li>Runs <code>envsubst</code> to replace placeholders (e.g., <code>$VAR</code>) in the template</li>
   <li>Publishes the rendered file path and rendered content as outputs</li>
 </ol>
+
+<p align="center">
+  <a href="https://github.com/marketplace/actions/templateer">
+    <img alt="Release" src="assets/templateer-example-large.png" />
+  </a>
+</p>
 
 <h2>Inputs</h2>
 
