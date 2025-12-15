@@ -49,7 +49,7 @@ Render templates in GitHub Actions using environment variables.
 
 <p align="center">
   <a href="https://github.com/marketplace/actions/templateer">
-    <img alt="Release" src="assets/templateer-example-large.png" />
+    <img alt="Release" src="../assets/templateer-example-large.png" />
   </a>
 </p>
 
