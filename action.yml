@@ -1,6 +1,6 @@
-# Malnati/templateer@v1.0.0
+# Malnati/templateer@v1.0.1
 name: "Templateer"
-description: "Engine de renderizar templates."
+description: "Render timeline messages, checklists, and status reports consistently across workflows."
 author: "Ricardo Malnati"
 
 branding:
@@ -9,22 +9,22 @@ branding:
 
 inputs:
   template:
-    description: "Caminho do template."
+    description: "Template path."
     required: true
   result:
-    description: "Caminho do arquivo de saída."
+    description: "Output file path."
     required: true
   debug:
-    description: "Se 'true', imprime as variáveis exportadas."
+    description: "If 'true', prints the exported variables."
     required: false
     default: "false"
 
 outputs:
   path:
-    description: "Caminho do arquivo renderizado."
+    description: "Rendered file path."
     value: ${{ steps.replacer.outputs.path }}
   body:
-    description: "Conteúdo renderizado."
+    description: "Rendered content."
     value: ${{ steps.replacer.outputs.body }}
 
 runs:
@@ -37,7 +37,7 @@ runs:
         DEBUG: ${{ inputs.debug }}
       run: |
         set -euo pipefail
-        echo "🪄 Exportando variáveis para o template"
+        echo "🪄 Exporting variables to the template"
         env | grep -v '^GITHUB_' | while IFS='=' read -r key value; do
           if [ "${DEBUG:-false}" = "true" ]; then
             printf '%s=%s\n' "$key" "$value"
